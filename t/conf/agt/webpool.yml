@@ -1,0 +1,55 @@
+---
+webpool:
+  description: Webpool
+  # base relationship name
+  me: hostram
+  provider_class: P_Memory_Host
+  root_container_class: C_Webpool
+  root_container_alias: webpool
+  # list of all relationships
+  providers:
+    hostram: [ host ]
+    hostcpu: [ host ]
+  result_helpers:
+    - Ports: [ postallocate ]
+  ports:
+    container: webpool
+    container_class: C_Webpool
+    entity: host
+    entity_class: C_Host
+    entities_of_container_function: hosts_of_webpool
+    entity_to_container_function: webpool_name
+    container_function: host
+    provider_class: P_Ports_Host
+    nr_class: NR_Hostports
+    provider_relation: hostports
+    exclusion_class: M_Port_Exclusion
+  # where to find location parameters
+  location:
+    webpool_name: webpool
+    continent: [ host ]
+    building: [ host ]
+    hostname: [ host ]
+  location_join: [ { host: webpool } ]
+  provider_to_location_join:
+    hostram:
+      host: webpool
+    hostcpu:
+      host: webpool
+    hostports:
+      host: webpool
+  # join clause for DBIC to get all the above info
+  join_clause:
+    - { host: [ hostcpu ] }
+    - hostram
+  join_clause_non_explicit_attributes:
+    - environments
+    - owners
+  overcommit:
+    - { overcommit_provider: provider.overcommit_ratio }
+    - { overcommit_environment: '\&get_correlated_environment_overcommit' }
+    - { overcommit_providertype: providertype.overcommit_ratio }
+  overcommit_join:
+    provider:
+      providertype:
+        - provider_type_environment_defaults

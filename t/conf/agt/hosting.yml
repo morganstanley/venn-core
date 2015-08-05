@@ -1,0 +1,50 @@
+---
+hosting:
+    description: Hosting
+    # base relationship name
+    me: ram
+    # base provider class
+    provider_class: P_Memory_Cluster
+    # root container class
+    root_container_class: C_Rack
+    # root container alias
+    root_container_alias: rack
+    # list of all relationships
+    providers:
+        ram:  [ cluster ]
+        cpu:  [ cluster ]
+        disk: [ cluster, rack, filers ]
+        filerio: [ cluster, rack, filers ]
+    # where to find location parameters
+    location:
+        rack_name: [ rack ]
+        organization: [ rack ]
+        hub: [ rack ]
+        continent: [ rack ]
+        country: [ rack ]
+        campus: [ rack ]
+        city: [ rack ]
+        building: [ rack ]
+    provider_to_location_join:
+        ram: { cluster: rack }
+        cpu: { cluster: rack }
+        disk: { filer: rack }
+        filerio: { filer: rack }
+    # join clause for DBIC to get all the above info
+    join_clause:
+        - { cluster: { rack: { filers: [ disk, filerio ] } } }
+        - cpu
+        - ram
+    join_clause_non_explicit_attributes:
+        - environments
+        - owners
+    place_format: Placed on cluster %s, share %s, filer %s
+    place_args: [ cpu.cluster_name, disk.share_name, filerio.filer_name ]
+    overcommit:
+        - { overcommit_provider: provider.overcommit_ratio }
+        - { overcommit_environment: '\&get_correlated_environment_overcommit' }
+        - { overcommit_providertype: providertype.overcommit_ratio }
+    overcommit_join:
+        provider:
+            providertype:
+                - provider_type_environment_defaults

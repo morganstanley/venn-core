@@ -1,0 +1,111 @@
+---
+ name: Cell
+ display_name: Cell
+ table: C_CELLS
+ +roles: 'Venn::SchemaRole::Result::Validators'
+ #+rs_roles: 'Venn::SchemaRole::ResultSet::Action::Basic::Cell'
+ agt_name: cell
+ primary_key: cell_name
+ primary_field: cell_name
+ indices: [cell_name, continent, country, city, datacenter]
+ columns:
+    - cell_name: { display_name: Cell, data_type: varchar, is_nullable: 0, size: 64, validate: '\&cell_name' }
+    - continent: { display_name: Continent, data_type: varchar, is_nullable: 0, size: 32, documentation: Continent, used for location }
+    - country: { display_name: Country, data_type: varchar, is_nullable: 0, size: 32, documentation: Country, used for location }
+    - city: { display_name: City, data_type: varchar, is_nullable: 0, size: 32, documentation: City, used for location }
+    - datacenter: { display_name: Datacenter, data_type: varchar, is_nullable: 0, size: 24, documentation: Datacenter Name }
+ containers:
+    clusters:
+       name: Cluster
+       display_name: Clusters
+       primary_field: cluster_name
+       container_name: rack
+       container_field: cell_name
+       table: C_CLUSTERS
+       +roles: 'Venn::SchemaRole::Result::Validators'
+       #+rs_roles: 'Venn::SchemaRole::ResultSet::Action::Virt::Cluster'
+       primary_key: cluster_name
+       link_column: cell_name
+       indices: [cluster_name, cell_name]
+       columns:
+         - cluster_name: { display_name: Cluster, data_type: varchar, is_nullable: 0, size: 64, validate: '\&cluster_name' }
+       subproviders:
+         clustermem:
+             class: Cluster_Memory
+             name: Cluster_Memory
+             display_name: 'Provider: Cluster Memory'
+             +roles: 'Venn::SchemaRole::Result::Validators'
+             container_rel: cluster
+             table: P_CLUSTER_MEMORY
+             link_column: cluster_name # derive a column from parent, useful for minimal subproviders
+             columns:
+               - cluster_type: { display_name: Cluster Type, data_type: varchar, is_nullable: 0, is_foreign_key: 1, size: 64,
+                                 documentation: Cluster Type, validate: '\&cluster_type', validate_error: Cluster type does not exist }
+             belongs_to:
+               cluster_type:
+                 class: Cluster_Type
+                 condition: cluster_type
+                 attributes: { on_update: restrict, on_delete: restrict }
+             has_one:
+               clustercpu:
+                 class: P_Cluster_Cpu
+                 condition: { foreign.cluster_name: self.cluster_name }
+                 attributes: { cascade_delete: 0, cascade_update: 0, is_foreign_key_constraint: 0 }
+         clustercpu:
+             class: Cluster_Cpu
+             name: Cluster_Cpu
+             display_name: 'Provider: Cluster CPU'
+             container_rel: cluster
+             table: P_CLUSTER_CPU
+             link_column: cluster_name # derive a column from parent, useful for minimal subproviders
+             +roles: 'Venn::SchemaRole::Result::Validators'
+             columns:
+               - cluster_type: { display_name: Cluster Type, data_type: varchar, is_nullable: 0, is_foreign_key: 1, size: 64,
+                                 documentation: Cluster Type, validate: '\&cluster_type', validate_error: Cluster type does not exist }
+             belongs_to:
+               cluster_type:
+                 class: Cluster_Type
+                 condition: cluster_type
+                 attributes: { on_update: restrict, on_delete: restrict }
+             has_one:
+               clustermem:
+                 class: P_Cluster_Memory
+                 condition: { foreign.cluster_name: self.cluster_name }
+                 attributes: { cascade_delete: 0, cascade_update: 0, is_foreign_key_constraint: 0 }
+    filers:
+       name: Filer
+       display_name: Filers
+       primary_field: filer_name
+       container_name: rack
+       container_field: cell_name
+       table: C_FILERS
+       +roles: 'Venn::SchemaRole::Result::Validators'
+       #+rs_roles: 'Venn::SchemaRole::ResultSet::Action::Virt::Filer'
+       primary_key: filer_name
+       link_column: cell_name
+       indices: [filer_name, cell_name]
+       columns:
+         - filer_name: { display_name: Filer, data_type: varchar, is_nullable: 0, size: 64, documentation: 'Name of the filer (e.g. vin86f1)',
+                         validate: '\&filer_name', validate_error: Filer name does not exist }
+       subproviders:
+         nas:
+             class: Nas_Share_Storage
+             name: Nas_Share_Storage
+             display_name: 'Provider: Storage (NAS Share)'
+             +roles: 'Venn::SchemaRole::Result::Validators'
+             container_rel: filer
+             container_field: filer_name
+             table: P_STORAGE_NAS_SHARES
+             link_column: filer_name # derive a column from parent, useful for minimal subproviders
+             primary_field: share_name
+             indices: [filer_name, share_name]
+             columns:
+               - share_name: { display_name: Share name, data_type: varchar, is_nullable: 0, size: 64, documentation: 'Name of the share (e.g. vmdisk123)',
+                               validate: '\&share_name', validate_error: Share does not exist }
+         filerio:
+             class: Io_Filer
+             name: Io_Filer
+             display_name: 'Provider: IO (NAS Filer)'
+             container_rel: filer
+             table: P_IO_FILERS
+             link_column: filer_name # derive a column from parent, useful for minimal subproviders

@@ -1,0 +1,82 @@
+package Venn::Schema::Result::Cluster_Type;
+
+=head1 NAME
+
+Venn::Schema::Result::Cluster_Type
+
+=head1 DESCRIPTION
+
+Cluster type table.
+
+=head1 AUTHOR
+
+Venn Engineering
+
+Josh Arenberg, Norbert Csongradi, Ryan Kupfer, Hai-Long Nguyen
+
+=head1 LICENSE
+
+Copyright 2013,2014,2015 Morgan Stanley
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+
+# TODO: move to yml
+
+use Moose;
+use MooseX::NonMoose;
+use namespace::autoclean;
+extends 'Venn::SchemaBase::Result';
+with 'Venn::SchemaRole::Result::CommonClassAttributes';
+
+__PACKAGE__->config(
+    display_name  => 'Cluster Type',
+    primary_field => 'cluster_type',
+);
+
+__PACKAGE__->table("CLUSTER_TYPES");
+
+__PACKAGE__->load_components(qw/Validator/);
+
+__PACKAGE__->add_columns(
+    cluster_type => {
+        display_name   => 'Cluster Type',
+        data_type      => 'varchar',
+        is_nullable    => 0,
+        size           => 64,
+        documentation  => 'Type of cluster',
+        validate       => sub {
+            my ($profile, $cluster_type) = @_;
+            return $cluster_type =~ /^(?:big|small)$/;
+        },
+        validate_error => 'Invalid cluster type: must be "big" or "small"',
+    },
+);
+
+__PACKAGE__->set_primary_key('cluster_type');
+
+__PACKAGE__->indices({
+    clustertype_pk_idx => [qw( cluster_type )],
+});
+
+__PACKAGE__->has_many(
+    'cluster_mem' => 'Venn::Schema::Result::P_Cluster_Memory',
+    'cluster_type'
+);
+__PACKAGE__->has_many(
+    'cluster_cpu' => 'Venn::Schema::Result::P_Cluster_Cpu',
+    'cluster_type'
+);
+
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);

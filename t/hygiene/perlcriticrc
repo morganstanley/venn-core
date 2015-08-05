@@ -1,0 +1,63 @@
+# default severity level
+severity         = 3
+# only check things listed here
+only             = 0
+# observe ## no critic
+force            = 0
+# 1-11, 4=one file default, 5=multi file default, 8+ include policy name
+verbose          = 8
+# load 'unsafe' modules (for dynamic policies)
+allow-unsafe     = 1
+# color output (when using perlcritic)
+color            = 1
+
+# theme expression
+#theme            = pbp && bugs && security
+#include         = NamingConventions ClassHierarchies
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Mouse Mouse::Role
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Mouse Mouse::Role
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[TestingAndDebugging::RequireUseWarnings]
+severity = 5
+
+# we're using moose so this breaks everything
+[-Modules::RequireEndWithOne]
+
+# good idea in theory, breaks in practice w/Moose (around, before, etc.)
+[-Modules::ProhibitExcessMainComplexity]
+
+# require /x at the end of a regex
+# you should use this if you need formatting/comments, but don't require it
+[-RegularExpressions::RequireExtendedFormatting]
+
+# TODO: we should switch to carp, but for now, allow this
+[-ErrorHandling::RequireCarping]
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = @ARGV $ARGV %ENV $ENV
+
+# allow disabling perlcritic for development code
+[-Miscellanea::ProhibitUnrestrictedNoCritic]
+
+# this is totally broken (but you should always check your eval return values
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[Subroutines::RequireFinalReturn]
+terminal_funcs = return carp croak die exec exit goto throw try catch
+
+# i'll tell you when i've had enough!
+[Subroutines::ProhibitManyArgs]
+max_arguments = 10
+
+# use v5.14
+[-ValuesAndExpressions::ProhibitVersionStrings]

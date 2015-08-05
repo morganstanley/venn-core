@@ -1,0 +1,45 @@
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+APACHE
+
+Assuming venn-core is installed to /var/venn/core, your implementation is in
+/var/venn/hosting, and you're running a dev environment for Venn.
+
+    Alias /venn /var/venn/hosting/fcgi-bin/venn_fastcgi.pl
+    FastCgiServer /var/venn/hosting/fcgi-bin/venn_fastcgi.pl \
+        -idle-timeout 300 \
+        -initial-env CORE_DIR=/var/venn/core \
+        -initial-env CATALYST_HOME=/var/venn/hosting \
+        -initial-env VENN_ENV=dev \
+        -initial-env VENN_LOG_BASE=/var/venn/hosting/logs
+
+
+    <Directory /var/venn/hosting/fcgi-bin/>
+    Order allow,deny
+    Allow from all
+    Options FollowSymLinks ExecCGI
+    SetEnv CORE_DIR "/var/venn/core"
+    SetEnv CATALYST_HOME "/var/venn/hosting"
+    SetEnv VENN_ENV "dev"
+    SetEnv VENN_LOG_BASE "/var/venn/hosting/logs"
+    SetHandler fastcgi-script
+    </Directory>
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Venn
+
+You can also look for information at:
+
+    Venn GitHub
+        http://.../venn-core

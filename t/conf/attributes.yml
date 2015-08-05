@@ -1,0 +1,83 @@
+---
+#
+# Environments (dev, qa, prod, etc.)
+#
+
+Environment:
+    table: A_ENVIRONMENTS
+    display_name: Environments
+    primary_field: environment
+    primary_key: environment
+    indices: [ environment ]
+    +rs_roles:
+        - A_Environment
+    columns:
+        - environment: { display_name: Environment, data_type: varchar, is_nullable: 0, size: 32,
+                         documentation: 'Environment (prod, qa, dev, etc.)' }
+        - description: { display_name: Description, data_type: varchar, is_nullable: 0, size: 255,
+                         documentation: 'Human readable description of the environment' }
+    # TODO: figure out how to generate these
+    has_many:
+        provider_type_environment_defaults:
+            class: J_Provider_Type_Environment_Default
+            condition: environment
+    many_to_many:
+        provider_type_defaults:
+            accessor: provider_type_environment_defaults
+            condition: environment
+    custom_relationships:
+        J_Provider_Environment:
+            has_many:
+                defaults:
+                    class: J_Provider_Type_Environment_Default
+                    condition:
+                        foreign.environment: self.environment
+        Provider_Type:
+            has_many:
+                provider_type_environment_defaults:
+                    class: J_Provider_Type_Environment_Default
+                    condition:
+                        foreign.providertype_name: self.providertype_name
+            many_to_many:
+                environment_defaults:
+                    accessor: provider_type_environment_defaults
+                    condition: providertype_name
+
+#
+# Capabilities (aka "tags")
+#
+
+Capability:
+    table: A_CAPABILITIES
+    display_name: Capabilities
+    primary_field: capability
+    primary_key: capability
+    +rs_roles:
+        - A_Capability
+    indices: [ capability, explicit ]
+    columns:
+        - capability:  { display_name: Capability, data_type: varchar, is_nullable: 0, size: 32,
+                         documentation: 'Name of the capability' }
+        - description: { display_name: Description, data_type: varchar, is_nullable: 0, size: 255,
+                         documentation: 'Description of the capability' }
+        - explicit:    { display_name: Explicit, data_type: boolean, is_nullable: 0,
+                         documentation: 'This will not be available for assignment unless explicitly asked for' }
+    explicit_column: explicit
+
+#
+# Owner IDs
+#
+
+Owner:
+    table: A_OWNER
+    display_name: Owner IDs
+    primary_field: id
+    primary_key: id
+    +rs_roles:
+        - A_Owner
+    indices: [ id ]
+    columns:
+        - id:       { display_name: ID, data_type: integer, is_nullable: 0,
+                      documentation: 'Owner ID' }
+        - description: { display_name: Display Name, data_type: varchar, size: 255, is_nullable: 1,
+                         documentation: 'Display name of the ID' }

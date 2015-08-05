@@ -1,0 +1,131 @@
+---
+ name: Rack
+ display_name: Racks
+ table: C_RACKS
+ +roles: 'Venn::SchemaRole::Result::Validator_Basic'
+# +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Rack'
+ agt_name: hosting
+ primary_key: rack_name
+ primary_field: rack_name
+ indices: [rack_name, organization, hub, continent, country, campus, city, building]
+ columns:
+    - rack_name:    { display_name: Rack, data_type: varchar, is_nullable: 0, size: 64,
+                      validate: '\&valid_rack', validate_error: rack does not exist,
+                      documentation: Rack name }
+    - organization: { display_name: Organization, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: Organization (used for location) }
+    - hub:          { display_name: Hub, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: Hub (used for location) }
+    - continent:    { display_name: Continent, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: Continent (used for location) }
+    - country:      { display_name: Country, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: Country (used for location) }
+    - campus:       { display_name: Campus, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: Campus (used for location) }
+    - city:         { display_name: City, data_type: varchar, is_nullable: 0, size: 2,
+                      documentation: City (used for location) }
+    - building:     { display_name: Building, data_type: varchar, size: 3, is_nullable: 0,
+                      documentation: Building (used for location) }
+ containers:
+    clusters:
+       name: Cluster
+       display_name: Clusters
+       primary_field: cluster_name
+       container_name: rack
+       container_field: rack_name
+       table: C_CLUSTERS
+       +roles: 'Venn::SchemaRole::Result::Validator_Basic'
+#       +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Cluster'
+       primary_key: cluster_name
+       link_column: rack_name
+       indices: [cluster_name, rack_name]
+       columns:
+         - cluster_name: { display_name: Cluster, data_type: varchar, is_nullable: 0, size: 64, validate: '\&valid_cluster', validate_error: cluster does not exist }
+       subproviders:
+         ram:
+             class: Memory_Cluster
+             name: Memory_Cluster
+             display_name: 'Provider: Memory'
+             category: memory
+             unit: MB
+             overcommit_ratio: ~
+             container_rel: cluster
+             link_column: cluster_name # derive a column from parent, useful for minimal subproviders
+             has_one:
+               cpu:
+                 class: P_Cpu_Cluster
+                 condition:
+                   foreign.cluster_name: self.cluster_name
+                 attributes:
+                   cascade_delete: 0
+                   cascade_update: 0
+                   is_foreign_key_constraint: 0
+         cpu:
+             class: Cpu_Cluster
+             name: Cpu_Cluster
+             display_name: 'Provider: Cpu'
+             category: compute
+             unit: cores
+             overcommit_ratio: ~
+             container_rel: cluster
+             link_column: cluster_name # derive a column from parent, useful for minimal subproviders
+             has_one:
+               ram:
+                 class: P_Memory_Cluster
+                 condition:
+                   foreign.cluster_name: self.cluster_name
+                 attributes:
+                   cascade_delete: 0
+                   cascade_update: 0
+                   is_foreign_key_constraint: 0
+    filers:
+       name: Filer
+       display_name: Filers
+       primary_field: filer_name
+       container_name: rack
+       container_field: rack_name
+#       +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Filer'
+       primary_key: filer_name
+       link_column: rack_name
+       indices: [filer_name, rack_name]
+       columns:
+         - filer_name:
+            display_name: Filer
+            data_type: varchar
+            is_nullable: 0
+            size: 64
+            documentation: 'Name of the filer'
+       subproviders:
+         disk:
+             class: Storage_Disk_Share
+             name: Storage_Disk_Share
+             display_name: 'Provider: Storage (Disk Share)'
+             category: storage
+             unit: MB
+             overcommit_ratio: ~
+             +roles: 'Venn::SchemaRole::Result::Validator_Basic'
+#             +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Disk'
+             container_rel: filer
+             container_field: filer_name
+             link_column: filer_name # derive a column from parent, useful for minimal subproviders
+             primary_field: share_name
+             indices: [filer_name, share_name]
+             columns:
+               - share_name:
+                   display_name: Share name
+                   data_type: varchar
+                   is_nullable: 0
+                   size: 64
+                   documentation: 'Name of the share'
+                   validate: '\&valid_share'
+                   validate_error: share does not exist in AQ
+         filerio:
+             class: Io_Filer
+             name: Io_Filer
+             display_name: 'Provider: IO (Disk Filer)'
+             category: io
+             unit: iops
+             overcommit_ratio: ~
+             container_rel: filer
+             table: P_IO_FILERS
+             link_column: filer_name # derive a column from parent, useful for minimal subproviders

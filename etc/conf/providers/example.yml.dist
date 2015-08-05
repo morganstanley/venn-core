@@ -1,0 +1,89 @@
+---
+name: Container_Class  # define the DBIC class as C_Container_Class
+display_name: An example container class  # textual name representation
+primary_field: container_name  # primary field, usually used as link_column in providers
+primary_key: container_name  # define DBIC set_primary_column
+container_field: ''  # this is a top-level container, need to explicitly set this
+table: C_CONTAINER_CLASS  # table name in DB
++roles: ['Role1']  # additional role for Result class
++rs_roles: 'Venn::SchemaRole::ResultSet::Action::Container'  # additional roles for ResultSet class
+agt_name: group1  # set AGT name for ResultSet
+indices: [container_name, field1, field2]  # define indexes on columns
+columns:
+   - container_name:  # first column
+        display_name: Container name  # standard DBIC column definition fields
+        data_type: varchar
+        is_nullable: 0
+        size: 64
+        validate: '\&function_reference'  # validator function, need to be defined by added roles
+        validate_error: "Validation failed for container_name!"
+   - field1:
+        display_name: Field 1
+        data_type: varchar
+        is_nullable: 0
+        size: 2
+        documentation: This field is used for...
+   - field2:
+       display_name: Field 2
+       data_type: int
+       is_nullable: 1
+containers:  # sub-containers of this container, they can be stacked arbitrarily deep
+   hosts:  # relation name
+      name: Sub_Container  # class name => C_Sub_Container
+      display_name: A sub-container
+      primary_field: subcontainer_name
+      primary_key: subcontainer_name
+      container_name: container_class  # name of the container
+      container_field: container_name  # which field used for linking
+      link_column: container_name  # derive column definition from parent, adds column to columns definition
+      table: C_HOSTS
+      +roles: 'Venn::SchemaRole::Result::Sub_Container'
+      +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Sub_Container'
+      indices: [subcontainer_name, container_name]
+      columns:
+        - subcontainer_name:
+           display_name: Sub-container name
+           data_type: varchar
+           is_nullable: 0
+           size: 64
+      subproviders:  # define sub-providers (pooled resources)
+        provider1:
+            class: Provider1  # defined class as P_Provider1
+            name: First provider
+            display_name: 'Provider: My first one'
+            container_rel: host  # belongs_to relation back to parent
+            table: P_PROVIDER_1
+            link_column: subcontainer_name # derive a column from parent
+        countable_resource:
+            class: Countable_Resource  # define a provider with named_resources support
+            display_name: 'Provider: A named resource provider'
+            container_rel: host
+            link_column: subcontainer_name
+            table: P_COUNTABLE_RESOURCE
+            columns:
+              - resource_min:
+                  display_name: Resource range minimum
+                  data_type: integer
+                  is_nullable: 0
+                  documentation: The minimum resource range to be allocated
+                  default_value: 1024
+              - resource_max:
+                  display_name: Resource range maximum
+                  data_type: integer
+                  is_nullable: 0
+                  documentation: The maximum resource range to be allocated
+                  default_value: 65535
+            named_resources:  # named_resources definition
+              named_res1:  # name of the relation
+               name: My resources
+               resourcename: res1
+               table: NR_RES1
+               columns:
+                  - start_number:
+                       display_name: Starts at
+                       data_type: integer
+                       is_nullable: 0
+                  - size:
+                       display_name: Allocated range size
+                       data_type: integer
+                       is_nullable: 0

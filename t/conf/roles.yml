@@ -1,0 +1,29 @@
+---
+Generated:
+    Result:
+        subprovider:
+            - CommonClassAttributes
+            - ProviderTypeAttributes
+            - SubProvider
+        named_resource:
+            - CommonClassAttributes
+            - NamedResource
+        container:
+            - CommonClassAttributes
+            - ContainerClassAttributes
+            - GeneratorHelpers
+        attribute:
+            - CommonClassAttributes
+        join:
+            - CommonClassAttributes
+    ResultSet:
+        subprovider:
+            - Provider
+        container:
+            - AssignmentGroup
+Schema:
+    - DB2Hacks
+    - AutoDeploy
+Result:
+    Provider:
+        #- Attributes

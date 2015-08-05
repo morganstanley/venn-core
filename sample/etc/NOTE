@@ -1,0 +1,2 @@
+The config for the hosting and webpool implementation of Venn is stored in the
+t (test) directory and used in the unit tests.

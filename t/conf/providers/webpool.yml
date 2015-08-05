@@ -1,0 +1,122 @@
+---
+name: Webpool
+display_name: Webpools
+primary_field: webpool_name
+#+rs_roles: 'Venn::SchemaRole::ResultSet::Action::Webpool'
+agt_name: webpool
+primary_key: webpool_name
+indices: [webpool_name, continent, building]
+columns:
+   - webpool_name:
+        display_name: Webpool
+        data_type: varchar
+        is_nullable: 0
+        size: 64
+   - continent:
+        display_name: Continent
+        data_type: varchar
+        is_nullable: 0
+        size: 2
+        documentation: Continent, used for location
+   - building:
+       display_name: Building
+       data_type: varchar
+       size: 3
+       is_nullable: 0
+       documentation: Building, used for location
+containers:
+   hosts:
+      name: Host
+      display_name: Hosts
+      primary_field: hostname
+      container_name: webpool
+      container_field: webpool_name
+      agt_name: webpool
+      +roles: 'Venn::SchemaRole::Result::Host'
+#      +rs_roles: 'Venn::SchemaRole::ResultSet::Action::Host'
+      primary_key: hostname
+      link_column: webpool_name
+      indices: [hostname, webpool_name]
+      columns:
+        - hostname:
+           display_name: Host
+           data_type: varchar
+           is_nullable: 0
+           size: 64
+        - continent:
+           display_name: Continent
+           data_type: varchar
+           is_nullable: 0
+           size: 2
+           documentation: Continent, used for location
+        - building:
+           display_name: Building
+           data_type: varchar
+           size: 3
+           is_nullable: 0
+           documentation: Building, used for location
+      subproviders:
+        hostram:
+          class: Memory_Host
+          name: Memory_Host
+          display_name: 'Provider: Memory'
+          category: memory
+          unit: MB
+          overcommit_ratio: ~
+          container_rel: host
+          link_column: hostname
+        hostcpu:
+          class: Cpu_Host
+          name: Cpu_Host
+          display_name: 'Provider: Cpu'
+          category: compute
+          unit: cores
+          overcommit_ratio: ~
+          container_rel: host
+          link_column: hostname
+        hostports:
+          class: Ports_Host
+          display_name: 'Provider: Host ( For Named Ports )'
+          +roles: 'Venn::SchemaRole::Result::Validator_Basic'
+          category: network
+          unit: port
+          overcommit_ratio: ~
+          container_rel: host
+          link_column: hostname
+          columns:
+            - ports_min:
+                display_name: Port range minimum
+                data_type: integer
+                is_nullable: 0
+                documentation: The minimum port number to be allocated on a host
+                default_value: 1024
+                validate: '\&ports_min'
+                validate_error: currently support ports 1024-65535
+            - ports_max:
+                display_name: Port range maximum
+                data_type: integer
+                is_nullable: 0
+                documentation: The maximum port number to be allocated on a host
+                default_value: 65535
+                validate: '\&ports_max'
+                validate_error: currently support ports 1024-65535
+          named_resources:
+            hostports:
+              name: Port
+              resourcename: hostport
+              +roles: 'Venn::SchemaRole::Result::Validator_Basic'
+              columns:
+                - start_port:
+                    display_name: Port
+                    data_type: integer
+                    is_nullable: 0
+                    documentation: port on a host for assignment
+                    validate: '\&ports_min'
+                    validate_error: currently support ports 1024-65535
+                - num_ports:
+                    display_name: Number of ports
+                    data_type: integer
+                    is_nullable: 0
+                    documentation: Number of ports allocated
+                    validate: '\&ports_non_negative'
+                    validate_error: non-negative num_ports required

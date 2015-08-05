@@ -1,0 +1,85 @@
+package Catalyst::Action::Deserialize::YAMLXS;
+
+=head1 NAME
+
+Catalyst::Action::Deserialize::YAMLXS
+
+=head1 DESCRIPTION
+
+YAML::XS Deserializer for Catalyst
+
+=head1 SYNOPSIS
+
+    ---
+    name: Ryan
+    email: ryan@example.com
+
+Generates:
+
+    {
+        name  => 'Ryan',
+        email => 'ryan@example.com',
+    };
+
+=head1 AUTHOR
+
+Venn Engineering
+
+Josh Arenberg, Norbert Csongradi, Ryan Kupfer, Hai-Long Nguyen
+
+=head1 LICENSE
+
+Copyright 2013,2014,2015 Morgan Stanley
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+
+use v5.14;
+
+use Moose;
+use namespace::autoclean;
+
+extends 'Catalyst::Action';
+use YAML::XS;
+
+=head1 METHODS
+
+=head2 execute($controller, $c)
+
+Serializes to the response body
+
+=cut
+
+sub execute {
+    my ( $self, $controller, $c, $test ) = @_;
+
+    my $body = $c->request->body;
+    if ($body) {
+        my $rdata;
+        eval {
+            $rdata = YAML::XS::LoadFile( "$body" );
+        };
+        if ($@) {
+            return $@;
+        }
+        $c->request->data($rdata);
+    }
+    else {
+        $c->log->debug('I would have deserialized, but there was nothing in the body!') if $c->debug;
+    }
+
+    return 1;
+}
+
+__PACKAGE__->meta->make_immutable;
