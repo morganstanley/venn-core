@@ -6,13 +6,13 @@ use Module::Build;
 
 use lib qw(lib);
 use Venn::Dependencies;
-BEGIN { eval { use Venn::LocalBuild; }; }
+BEGIN { eval qq{ use Venn::LocalBuild; }; }
 
 my $fake_builder = Module::Build->new(module_name => 'Venn');
 my @actions = $fake_builder->known_actions;
 my @code;
 for my $action (@actions) {
-    push @code, sprintf('sub ACTION_%s { eval { use Venn::LocalBuild; }; $_[0]->SUPER::ACTION_%s }',
+    push @code, sprintf('sub ACTION_%s { eval qq{ use Venn::LocalBuild; }; $_[0]->SUPER::ACTION_%s }',
                         $action, $action);
 }
 
