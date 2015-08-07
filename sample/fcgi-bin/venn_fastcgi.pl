@@ -6,8 +6,8 @@ use warnings;
 # use our own dependencies
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
-BEGIN { eval { use Venn::LocalInit }; }
-BEGIN { eval { use Venn::FindLib }; }
+BEGIN { eval qq{ use Venn::LocalInit }; }
+BEGIN { eval qq{ use Venn::FindLib }; }
 use Venn::Dependencies;
 
 use Catalyst::ScriptRunner;
