@@ -7,7 +7,7 @@ use FindBin ();
 
 # use our own dependencies and environment init
 use lib "$FindBin::Bin/../lib";
-BEGIN { eval { use Venn::LocalInit }; }
+BEGIN { eval qq{ use Venn::LocalInit }; }
 use Venn::Dependencies;
 
 use Catalyst::ScriptRunner;
