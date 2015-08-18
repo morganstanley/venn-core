@@ -50,6 +50,9 @@ use Data::UUID;
 use Venn::Types qw(:all);
 use Venn::PlacementEngine::Request;
 use Venn::PlacementEngine::Result;
+use Venn::Exception qw(
+    API::InvalidRequestResource
+);
 
 has 'schema' => (
     is            => 'ro',
@@ -216,5 +219,27 @@ sub helpers {
     return ensure_all_roles($self, map { "Venn::PlacementEngine::Helper::$_" } @helpers);
 }
 
+=head2 validate_request_resources($request)
+
+Validates resources if they were part of the AGT definition (valid providers bound to this AGT)
+Raises an exception if not.
+
+=cut
+
+sub validate_request_resources {
+    my ($self, $request) = @_;
+
+    my @valid_resources = keys %{$self->definition->{providers}};
+
+    for my $resource (keys %{$request->{resources}}) {
+        unless ($resource ~~ @valid_resources) {
+            Venn::Exception::API::InvalidRequestResource->throw({
+                resource => $resource,
+            });
+        }
+    }
+
+    return 1;
+}
 
 1;

@@ -10,7 +10,7 @@ use lib "$FindBin::Bin/../..";
 use t::bootstrap::Bootstrap 'bootstrap';
 use t::bootstrap::Methods qw( :all );
 
-use Test::Most tests => 58;
+use Test::Most tests => 60;
 use Catalyst::Test 'Venn';
 use Data::Dumper;
 use HTTP::Request::Common qw( GET PUT POST DELETE );
@@ -440,7 +440,47 @@ my $identifier;
     }
 }
 
+# POST place test with a wrong resource specified (foobar)
+{
+    my %wrong_placement = %placement;
+    $wrong_placement{resources} = {
+        %{$placement{resources}},
+        foobar => 42,
+    };
+    my $agt = $wrong_placement{assignmentgroup_type};
+    my $strategy = "biggest_outlier";
+    my $uri = "/api/v1/place/$agt/$strategy";
 
+    my $place_resp = request(
+        POST $uri,
+        Content_Type => 'application/json',
+        Content      => encode_json(\%wrong_placement),
+    );
+
+    my $result = decode_json($place_resp->content);
+    ok $result->{error} =~ /error.*Not a resource: foobar/, 'Wrong request resource identified and refused';
+}
+
+# POST place test with an unbound resource specified (hostram)
+{
+    my %wrong_placement = %placement;
+    $wrong_placement{resources} = {
+        %{$placement{resources}},
+        hostram => 42,
+    };
+    my $agt = $wrong_placement{assignmentgroup_type};
+    my $strategy = "biggest_outlier";
+    my $uri = "/api/v1/place/$agt/$strategy";
+
+    my $place_resp = request(
+        POST $uri,
+        Content_Type => 'application/json',
+        Content      => encode_json(\%wrong_placement),
+    );
+
+    my $result = decode_json($place_resp->content);
+    ok $result->{error} =~ /error.*Invalid request resource/, 'Unbound request resource identified and refused';
+}
 
 
 # Retrieve assignments for an assignmentgroup

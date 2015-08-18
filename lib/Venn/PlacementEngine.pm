@@ -196,7 +196,7 @@ sub place {
         }
 
         my $strategy = $self->strategies->{$self->_strategy_name}->new($self->_init_args);
-
+        $strategy->validate_request_resources($self->_init_args->{request});
         $placement = $strategy->place();
 
         push @placement_result, $placement;
@@ -232,7 +232,10 @@ sub _build_strategy {
 
     die "Placement engine has not been initialized!" unless $self->_init_args;
 
-    return $self->strategies->{$self->_strategy_name}->new($self->_init_args);
+    my $strategy = $self->strategies->{$self->_strategy_name}->new($self->_init_args);
+    $strategy->validate_request_resources($self->_init_args->{request});
+
+    return $strategy;
 }
 
 =head2 capacity($request)
