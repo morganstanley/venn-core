@@ -204,6 +204,9 @@ sub place {
         given ($placement->state) {
             when (/^Placed$/) {
                 push @instances, $placement->placement_location->{hostname}; # FIXME! dynamic field?
+                # they should end up in the same assignment group, commit group
+                $self->_init_args->{assignment_group} ||= $placement->assignmentgroup->identifier if $placement->assignmentgroup;
+                $self->_init_args->{commit_group_id} ||= $placement->commit_group_id if $placement->commit_group_id;
             }
             when (/^(?:NotPlaced|NoCapacity)$/) {
                 last;
