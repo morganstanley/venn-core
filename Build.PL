@@ -12,8 +12,15 @@ my $fake_builder = Module::Build->new(module_name => 'Venn');
 my @actions = $fake_builder->known_actions;
 my @code;
 for my $action (@actions) {
-    push @code, sprintf('sub ACTION_%s { eval qq{ use Venn::LocalBuild; }; $_[0]->SUPER::ACTION_%s }',
-                        $action, $action);
+    if ($action eq 'build') {
+        push @code, sprintf('BEGIN { eval "use Venn::LocalBuild" } sub ACTION_%s {
+           $_[0]->do_system(qw(perl sbin/generate_swagger_documentation.pl)); $_[0]->SUPER::ACTION_%s; }',
+                            $action, $action);
+    }
+    else {
+        push @code, sprintf('BEGIN { eval "use Venn::LocalBuild" } sub ACTION_%s { $_[0]->SUPER::ACTION_%s }',
+                            $action, $action);
+    }
 }
 
 my $class = Module::Build->subclass(
@@ -72,9 +79,14 @@ my $builder = $class->new(
         'script/testserver.pl' => 'script/testserver.pl',
         'script/venn_server.pl' => 'script/venn_server.pl',
     },
+    sbin_files => {
+        'sbin/deploy_db.pl' => 'sbin/deploy_db.pl',
+        'sbin/generate_swagger_documentation.pl' => 'sbin/generate_swagger_documentation.pl',
+    },
 );
 $builder->add_build_element('cgi');
 $builder->add_build_element('root');
 $builder->add_build_element('script');
+$builder->add_build_element('sbin');
 
 $builder->create_build_script();
