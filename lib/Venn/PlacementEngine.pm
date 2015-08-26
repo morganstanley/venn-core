@@ -196,7 +196,7 @@ sub place {
         }
 
         my $strategy = $self->strategies->{$self->_strategy_name}->new($self->_init_args);
-
+        $strategy->validate_request_resources($self->_init_args->{request});
         $placement = $strategy->place();
 
         push @placement_result, $placement;
@@ -204,6 +204,9 @@ sub place {
         given ($placement->state) {
             when (/^Placed$/) {
                 push @instances, $placement->placement_location->{hostname}; # FIXME! dynamic field?
+                # they should end up in the same assignment group, commit group
+                $self->_init_args->{assignment_group} ||= $placement->assignmentgroup->identifier if $placement->assignmentgroup;
+                $self->_init_args->{commit_group_id} ||= $placement->commit_group_id if $placement->commit_group_id;
             }
             when (/^(?:NotPlaced|NoCapacity)$/) {
                 last;
@@ -232,7 +235,10 @@ sub _build_strategy {
 
     die "Placement engine has not been initialized!" unless $self->_init_args;
 
-    return $self->strategies->{$self->_strategy_name}->new($self->_init_args);
+    my $strategy = $self->strategies->{$self->_strategy_name}->new($self->_init_args);
+    $strategy->validate_request_resources($self->_init_args->{request});
+
+    return $strategy;
 }
 
 =head2 capacity($request)

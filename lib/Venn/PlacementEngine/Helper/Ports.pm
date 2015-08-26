@@ -392,7 +392,7 @@ sub _get_portrange {
     my $current_port = $self->port_response->{$hostname}{min_port};
     my $response;
 
-    while ($current_port <= $self->port_request->{max}) {
+    while ($current_port <= $self->port_request->{max}+1) {
         if (! $range_start) {
             if (my @allocation = @{$alloc_map->find($current_port, $current_port)}) { # assigned
                 $current_port += $allocation[0]{num}; # skip ports
@@ -401,6 +401,14 @@ sub _get_portrange {
             else { # not assigned
                 $range_start = $current_port; # save the port
                 $range_counter = 1;
+                if ($range_counter == $min_range && !$alloc_map->find($current_port, $current_port)) {
+                    # single-port range found and not allocated
+                    $response = {
+                        start => $range_start,
+                        num   => $range_counter,
+                    };
+                    last;
+                }
             }
         }
         else { # in range
