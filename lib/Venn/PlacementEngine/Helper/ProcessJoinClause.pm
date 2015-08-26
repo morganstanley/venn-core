@@ -38,6 +38,8 @@ use Moose::Role;
 use Scalar::Util qw(reftype);
 use Storable 'dclone';
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 =head1 METHODS
 
 =head2 process_join_clause($join_clause, $table_alias)

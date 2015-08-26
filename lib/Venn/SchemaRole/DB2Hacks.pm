@@ -37,6 +37,8 @@ limitations under the License.
 use v5.14;
 use Moose::Role;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 =head2 after sqlt_deploy_hooks($source, $sqlt_schema)
 
 Run our DB2 deploy fixes.

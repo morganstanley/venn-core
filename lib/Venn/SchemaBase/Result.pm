@@ -42,6 +42,8 @@ extends 'DBIx::Class::Core';
 use Scalar::Util qw( blessed reftype );
 use Data::Dumper;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 __PACKAGE__->load_components(qw[
     Helper::Row::ToJSON
     +DBIx::Class::Indexer

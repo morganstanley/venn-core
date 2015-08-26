@@ -48,6 +48,8 @@ use Venn::Types;
 use Venn::PlacementEngine;
 use Data::UUID;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 BEGIN {
     extends qw( Venn::Controller::API::v1 );
     with    qw( Venn::ControllerRole::API::Results );

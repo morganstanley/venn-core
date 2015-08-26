@@ -48,6 +48,8 @@ use Moose::Role;
 use YAML::XS;
 use Scalar::Util qw( reftype );
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 =head1 METHODS
 
 =head2 $self->simple_created($c, $result, opt $message, opt @message_args)

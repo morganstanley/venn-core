@@ -53,6 +53,8 @@ use Venn::Exception qw(
     Schema::InvalidVennEnv
 );
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 # This needs to run ASAP
 BEGIN {
     my $venn_env = $ENV{VENN_ENV} // 'sqlite';

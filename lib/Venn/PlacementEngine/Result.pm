@@ -57,6 +57,8 @@ use Scalar::Util qw( reftype );
 use MooseX::Types::Moose qw(Str ArrayRef HashRef Object Maybe);
 use MooseX::Types::Structured qw(Map);
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 has 'strategy' => (
     traits        => [qw( NoSerialize )],
     handles       => [qw( schema generate_uuid )],

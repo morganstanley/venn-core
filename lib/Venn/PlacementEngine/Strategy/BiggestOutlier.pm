@@ -47,6 +47,8 @@ use namespace::autoclean;
 use Data::Dumper;
 use Scalar::Util qw(reftype);
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 Venn::PlacementEngine::Strategy->helpers(qw(
     AvgResources
     JoinCorrelateFilter

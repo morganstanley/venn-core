@@ -38,6 +38,8 @@ use Moose;
 use MooseX::NonMoose;
 use namespace::autoclean;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 extends 'Venn::SchemaBase::ResultSet';
 
 =head1 METHODS

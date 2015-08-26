@@ -41,6 +41,8 @@ use List::Util qw(max);
 
 use Venn::Exception qw(Placement::PortsExhausted);
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 requires qw(log definition schema request
             placement_location placement_candidates);
 
