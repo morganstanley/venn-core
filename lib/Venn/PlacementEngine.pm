@@ -193,7 +193,7 @@ sub place {
             # exclude allocated instances
             $request->location->{hostname} = {'-and' => []}; # FIXME! dynamic field?
             for (@instances) {
-                push $request->location->{hostname}{'-and'}, { 'hostname' => {'!=' => $_} };
+                push @{ $request->location->{hostname}{'-and'} }, { 'hostname' => {'!=' => $_} };
             }
         }
 

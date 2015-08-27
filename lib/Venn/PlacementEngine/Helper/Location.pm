@@ -67,7 +67,7 @@ sub location_hash {
             $location{'-or'} = [];
 
             for (@{$location_request{$location}}) {
-                push $location{'-or'}, { $left_side => $_ };
+                push @{ $location{'-or'} }, { $left_side => $_ };
             }
         } elsif ((ref($location_request{$location}) // '') eq 'HASH') {
             my $condition = dclone($location_request{$location});
