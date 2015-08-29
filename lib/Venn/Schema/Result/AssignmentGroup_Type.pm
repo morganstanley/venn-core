@@ -40,7 +40,7 @@ with 'Venn::SchemaRole::Result::CommonClassAttributes';
 
 __PACKAGE__->config(
     display_name  => 'Assignment Group Types',
-    primary_field => 'name',
+    primary_field => 'assignmentgroup_type_name',
 );
 
 __PACKAGE__->table("ASSIGNMENT_GROUP_TYPES");
