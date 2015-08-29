@@ -38,6 +38,8 @@ use MooseX::ClassAttribute;
 
 use Lingua::EN::Inflect::Phrase;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 class_has '__runtime_init_called' => (
     is  => 'rw',
     isa => 'Bool',

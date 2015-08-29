@@ -48,6 +48,8 @@ use TryCatch;
 use Venn::Exception qw( API::InvalidSortPair );
 use Venn::Types qw(:all);
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 ## no critic (RequireFinalReturn)
 
 =head1 METHODS

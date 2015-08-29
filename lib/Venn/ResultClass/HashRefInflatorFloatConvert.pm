@@ -83,6 +83,8 @@ use 5.010;
 use Scalar::Util qw / reftype looks_like_number /;
 #use Data::Types qw/ is_float is_int /;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 # this class is designed for speed, sorry about the formatting
 ## no critic
 

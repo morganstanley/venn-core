@@ -54,6 +54,8 @@ use JSON::XS;
 use Data::Dumper;
 use Log::Log4perl;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 class_has 'log_base' => (
     is => 'ro',
     isa => 'Str',

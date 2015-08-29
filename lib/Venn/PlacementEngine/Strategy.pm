@@ -54,6 +54,8 @@ use Venn::Exception qw(
     API::InvalidRequestResource
 );
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 has 'schema' => (
     is            => 'ro',
     isa           => 'Venn::Schema',

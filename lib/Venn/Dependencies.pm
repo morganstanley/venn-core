@@ -343,6 +343,11 @@ BEGIN {
         'Perl::Tidy'          => '20140711',
         'Pod::Spell'          => '1.01',
         'Email::Address'      => '1.892',
+
+        # Not sure how you want to annotate these...
+        'Data::Walk'          => 0,
+        'Test::Most'          => 0,
+
     );
 }
 

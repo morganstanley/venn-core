@@ -40,6 +40,8 @@ use Moose::Role;
 use Data::Dumper;
 use Lingua::EN::Inflect::Phrase;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 =head2 __PACKAGE__->subproviders(\%definition)
 
 Creates all Subprovider (P_*) and NamedResource (NR_*) DBIC classes

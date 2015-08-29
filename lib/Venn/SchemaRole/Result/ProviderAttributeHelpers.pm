@@ -40,6 +40,8 @@ use Venn::Exception qw(
     API::InvalidAttribute
 );
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 =head2 map_attributes(\%attributes)
 
 Maps attributes to the provider.

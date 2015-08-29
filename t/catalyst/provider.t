@@ -16,6 +16,8 @@ use Data::Dumper;
 use HTTP::Request::Common qw( GET PUT POST DELETE );
 use JSON::XS;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 $ENV{VENN_TEST} = 1;
 $ENV{VENN_IN_MEMORY} //= 1;
 

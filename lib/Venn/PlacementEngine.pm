@@ -79,6 +79,8 @@ use Module::Pluggable
     inner       => 1,
 ;
 
+no if $] >= 5.018, warnings => q{experimental::smartmatch};
+
 class_has 'strategies' => (
     is      => 'ro',
     isa     => 'HashRef[Venn::PlacementEngine::Strategy]',
