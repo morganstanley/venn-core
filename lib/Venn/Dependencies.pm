@@ -347,6 +347,7 @@ BEGIN {
         # Not sure how you want to annotate these...
         'Data::Walk'          => 0,
         'Test::Most'          => 0,
+        'Carp::Always'        => 0,
 
     );
 }
