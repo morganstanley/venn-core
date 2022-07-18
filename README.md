@@ -1,5 +1,7 @@
 # Venn
 
+![Lifecycle Archived](https://badgen.net/badge/Lifecycle/Archived/grey)
+
 Venn is a flexible system for resource and capacity management for pools of
 shared resources.
 
